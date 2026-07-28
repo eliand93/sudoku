@@ -8,7 +8,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(SFML 2.5 COMPONENTS graphics window system REQUIRED)
 
 add_executable(sudoku 
-    src/main.cpp)
+    src/main.cpp
+    src/board.cpp)
 
 target_include_directories(sudoku PRIVATE include)
 target_link_libraries(sudoku sfml-graphics sfml-window sfml-system)
