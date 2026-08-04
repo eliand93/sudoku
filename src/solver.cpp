@@ -39,15 +39,13 @@ void Solver::checkBox(int row, int col){
     }
 }
 
-void Solver::checkFeasability() {
+void Solver::checkFeasability(int row, int col) {
     // Check for cells without any possible values (indicating an unsolvable state)
-    for (int row = 0; row < 9; ++row){
-        for (int col = 0; col < 9; ++col){
-            Cell& cell = board.getCell(row, col);
-            if (cell.numPossibleValues == 0){
-                printf("Cell (%d, %d) has no possible values. Puzzle is unsolvable.\n", row + 1, col + 1);
-            }
-        }
+
+    Cell& cell = board.getCell(row, col);
+    if (cell.numPossibleValues == 0){
+        printf("Cell (%d, %d) has no possible values. Puzzle is unsolvable.\n", row + 1, col + 1);
+
     }
 }
 
@@ -107,6 +105,41 @@ std::vector<int> Solver::getCellsWithTwoPossibleInRow(int row) {
         }
     }
     return cols;
+}
+
+std::vector<int> Solver::getPossibleRowsForNumInCol(int num, int col) {
+    std::vector<int> locations;
+    for (int row = 0; row < 9; ++row){
+        Cell& cell = board.getCell(row, col);
+        if (cell.value == 0 && cell.possibleValues[num - 1]) {
+            locations.push_back(row);
+        }
+    }
+    return locations;
+}
+
+std::vector<int> Solver::getPossibleColsForNumInRow(int num, int row) {
+    std::vector<int> locations;
+    for (int col = 0; col < 9; ++col){
+        Cell& cell = board.getCell(row, col);
+        if (cell.value == 0 && cell.possibleValues[num - 1]) {
+            locations.push_back(col);
+        }
+    }
+    return locations;
+}
+
+std::vector<int> Solver::getPossibleLocationsForNumInBox(int num, int boxRow, int boxCol) {
+    std::vector<int> locations;
+    for (int row = boxRow * 3; row < boxRow * 3 + 3; ++row){
+        for (int col = boxCol * 3; col < boxCol * 3 + 3; ++col){
+            Cell& cell = board.getCell(row, col);
+            if (cell.value == 0 && cell.possibleValues[num - 1]) {
+                locations.push_back(row * 9 + col); // Store as a single integer for simplicity
+            }
+        }
+    }
+    return locations;
 }
 
 std::vector<int> Solver::getCellsWithTwoPossibleInCol(int col) {
@@ -224,6 +257,96 @@ void Solver::updateNakedPairs() {
     }
 }
 
+void Solver::updateHiddenPairs() {
+    // Implementation for updating hidden pairs in rows
+
+    for (int row = 0; row < 9; ++row){
+        std::vector<std::vector<int>> locations(10);
+        for (int num = 1; num <= 9; ++num){
+            locations[num] = getPossibleColsForNumInRow(num, row);
+        }
+
+        // Compare each pair of numbers
+        for (int num1 = 1; num1 <= 8; ++num1){
+            if (locations[num1].size() != 2) {
+                continue;
+            }
+            for (int num2 = num1 + 1; num2 <= 9; ++num2){
+                if (locations[num1].size() == 2 && locations[num1] == locations[num2]){
+                    int col1 = locations[num1][0];
+                    int col2 = locations[num1][1];
+                    for (int num = 1; num <= 9; ++num){
+                        if (num != num1 && num != num2){
+                            board.getCell(row, col1).eliminatePossibleValue(num);
+                            board.getCell(row, col2).eliminatePossibleValue(num);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Implementation for updating hidden pairs in columns
+    for (int col = 0; col < 9; ++col){
+        std::vector<std::vector<int>> locations(10);
+        for (int num = 1; num <= 9; ++num){
+            locations[num] = getPossibleRowsForNumInCol(num, col);
+        }
+
+        // Compare each pair of numbers
+        for (int num1 = 1; num1 <= 8; ++num1){
+            if (locations[num1].size() != 2) {
+                continue;   
+            }
+            for (int num2 = num1 + 1; num2 <= 9; ++num2){
+                if (locations[num1].size() == 2 && locations[num1] == locations[num2]){
+                    int row1 = locations[num1][0];
+                    int row2 = locations[num1][1];
+                    for (int num = 1; num <= 9; ++num){
+                        if (num != num1 && num != num2){
+                            board.getCell(row1, col).eliminatePossibleValue(num);
+                            board.getCell(row2, col).eliminatePossibleValue(num);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Implementation for updating hidden pairs in boxes
+    for (int boxRow = 0; boxRow < 3; ++boxRow){
+        for (int boxCol = 0; boxCol < 3; ++boxCol){
+            std::vector<std::vector<int>> locations(10);
+            for (int num = 1; num <= 9; ++num){
+                locations[num] = getPossibleLocationsForNumInBox(num, boxRow, boxCol);
+            }   
+
+            // Compare each pair of numbers
+            for (int num1 = 1; num1 <= 8; ++num1){
+                if (locations[num1].size() != 2) {
+                    continue;
+                }
+                for (int num2 = num1 + 1; num2 <= 9; ++num2){
+                    if (locations[num1].size() == 2 && locations[num1] == locations[num2]){
+                        int row1 = locations[num1][0] / 9;
+                        int col1 = locations[num1][0] % 9;
+                        int row2 = locations[num1][1] / 9;
+                        int col2 = locations[num1][1] % 9;
+                        for (int num = 1; num <= 9; ++num){
+                            if (num != num1 && num != num2){
+                                board.getCell(row1, col1).eliminatePossibleValue(num);
+                                board.getCell(row2, col2).eliminatePossibleValue(num);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+
+}
+
 void Solver::updatePossibleValues() {
     for (int row = 0; row < 9; ++row){
         for (int col = 0; col < 9; ++col){
@@ -239,11 +362,13 @@ void Solver::updatePossibleValues() {
 
             checkBox(row, col);
 
-            checkFeasability();
+            checkFeasability(row, col);
         }
     }
 
     checkPointingPairs();
+    updateNakedPairs();
+    updateHiddenPairs();
 
     
 }

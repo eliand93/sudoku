@@ -108,6 +108,8 @@ bool Board::loadPuzzle(const std::string& filename) {
 
     //parse 81 numbers (skip 12 bytes hash and 1 space)
     std::string digits = chosen.substr(13, 81);
+    std::string rating = chosen.substr(95,4);
+    std::cout << "Puzzle with difficulty level " << rating << " loaded." << std::endl;
 
     for (int row = 0; row < 9; ++row) {
         for (int col = 0; col < 9; ++col) {
