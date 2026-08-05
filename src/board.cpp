@@ -5,8 +5,8 @@
 
 #include "board.hpp"
 
-void Board::test() {
-    std::cout << "Testing Board class..." << std::endl;
+void Board::test(int x) {
+    std::cout << "Testing Board class..." << x << std::endl;
 }
 
 bool Board::writeToGrid(int row, int col, int num) {
