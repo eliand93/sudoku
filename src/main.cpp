@@ -6,9 +6,10 @@
 
 int main() {
     std::cout << "Sudoku game starting..." << std::endl << std::endl << std::endl;
-
+    
 
     Board board;
+    board.test();
 
     std::cout << std::endl << "easy, medium, hard or diabolical? ";
     std::string difficulty;
@@ -17,6 +18,8 @@ int main() {
     if (!board.loadPuzzle("puzzles/" + difficulty + ".txt")){
         return 1; // Exit if puzzle loading fails
     };
+
+    
 
     // Main game loop
     while (true) {
