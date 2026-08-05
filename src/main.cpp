@@ -9,7 +9,7 @@ int main() {
     
 
     Board board;
-    board.test();
+    board.test(5);
 
     std::cout << std::endl << "easy, medium, hard or diabolical? ";
     std::string difficulty;
