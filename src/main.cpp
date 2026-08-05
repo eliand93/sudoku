@@ -18,6 +18,7 @@ int main() {
         return 1; // Exit if puzzle loading fails
     };
 
+    // Main game loop
     while (true) {
         board.displayBoard();
         std::cout << std::endl << "Enter your move (row col num) or 'q' to quit: ";
