@@ -6,7 +6,7 @@
 #include "board.hpp"
 
 void Board::test(int x) {
-    std::cout << "Testing Board class..." << x << std::endl;
+    std::cout << "Testing conflicts..." << x << std::endl;
 }
 
 bool Board::writeToGrid(int row, int col, int num) {
