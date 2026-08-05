@@ -23,7 +23,7 @@ class Board {
         bool writeToGrid(int row, int col, int num);
         void printPossibleValues(int row, int col);
         bool hasConflicts();
-        void test();
+        void test(int x);
 
 
 };
